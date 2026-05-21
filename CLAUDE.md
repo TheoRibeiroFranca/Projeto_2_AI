@@ -2,9 +2,13 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## Project Overview
+## Projects in This Repo
 
-This is an Insper AI trainee final project for MNIST digit classification using a neural network with strict architectural constraints. The primary deliverable is `notebook.ipynb`.
+**Active: Brazilian League Match Predictor** (GSD-managed — see `.planning/`)
+Predicts W/D/L outcomes for Brazilian Série A matches using rolling-window form features and scikit-learn classifiers. Three separate model notebooks: Logistic Regression, Random Forest, Gradient Boosting. Target: ~65-70% accuracy.
+
+**Legacy: MNIST Digit Classifier** (`notebook.ipynb`)
+Insper AI trainee deliverable. Two-phase Keras training on inverted MNIST. Input `(28,28)` uint8 → `(10,)` softmax. Weight file < 800 KB. Allowed layers: `Dense`, `Flatten`, `Rescaling`, `BatchNormalization`, `Dropout`.
 
 ## Setup & Running
 
@@ -12,44 +16,50 @@ This is an Insper AI trainee final project for MNIST digit classification using 
 # Install dependencies
 uv sync
 
+# Add football predictor dependencies (first time only)
+uv add scikit-learn "pandas>=2.1,<3"
+
 # Activate virtual environment
 source .venv/bin/activate
 
-# Launch the notebook
+# Launch football predictor notebooks
+jupyter notebook notebook_logistic.ipynb        # Logistic Regression baseline
+jupyter notebook notebook_random_forest.ipynb   # Random Forest
+jupyter notebook notebook_gradient_boost.ipynb  # Gradient Boosting (target: 65-70%)
+
+# Launch legacy MNIST notebook
 jupyter notebook notebook.ipynb
 ```
 
 Dependencies are managed with **UV** (`pyproject.toml` + `uv.lock`). Python >=3.11, <3.13 is required.
 
-## Model Constraints (Graded Requirements)
+## Football Predictor — Critical Gotchas
 
-The model submitted for evaluation must satisfy:
-- **Input:** `(28, 28)` uint8 images (pixel values 0–255)
-- **Output:** `(10,)` softmax probabilities (one per digit class)
-- **Weight file size:** < 800 KB
-- **Allowed layers only:** `Dense`, `Flatten`, `Rescaling`, `BatchNormalization`, `Dropout`
+**Temporal leakage (top risk — inflates accuracy 10-20 pp silently):**
+- Always use `.shift(1)` before `.rolling()` — never include the current match result in windows
+- Train/test split must use a fixed date cutoff, never `shuffle=True` or `KFold`
+- Do NOT join in-game stats (shots, possession) without confirming they are pre-match values
 
-## Architecture & Training Strategy
+**Draw class collapse:**
+- Always set `class_weight='balanced'` before the first `fit()` call
+- Always output `classification_report` — overall accuracy alone hides zero Draw recall
 
-The notebook follows a two-phase training approach:
+**Team name normalization:**
+- Build a canonical name dict before any `groupby` — 20+ seasons produce many variants (e.g. "Atletico-MG" vs "Atletico MG")
+- Assert top clubs have 380+ match rows after normalization
 
-**Phase 1** — Train on inverted MNIST images plus an external validation set:
-- Adam optimizer (lr=0.0005), batch size 256, up to 10 epochs
-- EarlyStopping with patience=10
-
-**Phase 2** — Fine-tune exclusively on the external validation set (replicated):
-- Adam optimizer (lr=0.00005), batch size 16, up to 40 epochs
-- EarlyStopping with patience=15
-
-The external validation set (`x_val`, `y_val`) is loaded via HTTP from a fixed URL at the top of the training cells. Data augmentation via image inversion is applied during Phase 1 to improve generalization.
+**Evaluation:**
+- Use `TimeSeriesSplit` exclusively — never `KFold` or `StratifiedKFold`
+- Compare against naive "always Home Win" baseline (~46%) before claiming success
+- Report macro-F1 alongside accuracy
 
 ## Data
 
-`dados/archive/` contains Brazilian football championship CSVs — these are **not used** by the current notebook (legacy from an earlier project version). The actual training data is MNIST loaded directly from `keras.datasets`.
+`dados/archive/` contains Brazilian football championship CSVs used by the football predictor:
+- `campeonato-brasileiro-full.csv` — primary source (9,165 matches, 2003–2025)
+- `campeonato-brasileiro-estatisticas-full.csv` — shot/possession stats (zero-filled pre-2013, use with caution)
 
-## Notebook Cell Organization
-
-The notebook is structured as: title/context → data loading → model definition → two-phase training → evaluation metrics → loss curve plots. Grading considers both documentation quality within cells and the leaderboard accuracy score.
+The legacy MNIST notebook loads data from `keras.datasets` and a fixed HTTP URL.
 
 <!-- GSD:project-start source:PROJECT.md -->
 ## Project
