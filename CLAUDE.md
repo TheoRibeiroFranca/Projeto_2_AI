@@ -13,16 +13,20 @@ Insper AI trainee deliverable. Two-phase Keras training on inverted MNIST. Input
 ## Setup & Running
 
 ```bash
-# Install dependencies
+# Install base dependencies
 uv sync
-
-# Add football predictor dependencies (first time only)
-uv add scikit-learn "pandas>=2.1,<3"
+uv add scikit-learn pyarrow seaborn pytest nbmake  # football predictor deps (not yet in pyproject.toml)
 
 # Activate virtual environment
 source .venv/bin/activate
 
-# Launch football predictor notebooks
+# Run Phase 1 data pipeline (produces parquet files)
+jupyter notebook notebook_data.ipynb
+
+# Test notebook execution end-to-end
+pytest --nbmake notebook_data.ipynb -x
+
+# Launch football predictor model notebooks (created during execution phases)
 jupyter notebook notebook_logistic.ipynb        # Logistic Regression baseline
 jupyter notebook notebook_random_forest.ipynb   # Random Forest
 jupyter notebook notebook_gradient_boost.ipynb  # Gradient Boosting (target: 65-70%)
@@ -50,7 +54,7 @@ Dependencies are managed with **UV** (`pyproject.toml` + `uv.lock`). Python >=3.
 
 **Evaluation:**
 - Use `TimeSeriesSplit` exclusively — never `KFold` or `StratifiedKFold`
-- Compare against naive "always Home Win" baseline (~46%) before claiming success
+- Compare against naive "always Home Win" baseline (49.6% — verified against actual dataset; the ~46% figure is wrong) before claiming success
 - Report macro-F1 alongside accuracy
 
 ## Data
@@ -58,8 +62,28 @@ Dependencies are managed with **UV** (`pyproject.toml` + `uv.lock`). Python >=3.
 `dados/archive/` contains Brazilian football championship CSVs used by the football predictor:
 - `campeonato-brasileiro-full.csv` — primary source (9,165 matches, 2003–2025)
 - `campeonato-brasileiro-estatisticas-full.csv` — shot/possession stats (zero-filled pre-2013, use with caution)
+- `campeonato-brasileiro-gols.csv` — goal-level event data
+- `campeonato-brasileiro-cartoes.csv` — card-level event data
 
 The legacy MNIST notebook loads data from `keras.datasets` and a fixed HTTP URL.
+
+## Football Predictor — Output Contract
+
+`notebook_data.ipynb` (Phase 1) produces two parquet files consumed by all model notebooks:
+
+| File | Rows | Period |
+|------|------|--------|
+| `dados/matches_train.parquet` | 8,025 | 2003–2022 |
+| `dados/matches_test.parquet` | 1,140 | 2023–2025 |
+
+**Schema (11 columns):** `id`, `date`, `season`, `round`, `home_team`, `away_team`, `home_score`, `away_score`, `home_state`, `away_state`, `result`
+
+**`result` encoding** (must be consistent across all 3 model notebooks):
+- `'HomeWin'` — home team won
+- `'Draw'` — match ended level
+- `'AwayWin'` — away team won
+
+**Do not re-derive `result` or re-run cleaning in model notebooks — load from parquet.**
 
 <!-- GSD:project-start source:PROJECT.md -->
 ## Project
@@ -81,56 +105,17 @@ A Jupyter notebook-based ML system that predicts the outcome (Home Win / Draw / 
 <!-- GSD:stack-start source:codebase/STACK.md -->
 ## Technology Stack
 
-## Languages
-- Python >=3.11, <3.13 - All project code; runtime resolves to 3.12.x in the active venv
-## Runtime
-- CPython 3.12.13 (system Python; venv at `.venv/`)
-- UV — managed via `pyproject.toml` + `uv.lock`
-- Lockfile: present (`uv.lock`)
-## Frameworks
-- TensorFlow 2.18.1 — backend compute engine; CPU-only (no CUDA drivers detected)
-- Keras 3.6.0 — high-level model API; used directly via `tensorflow.keras`
-- `keras.datasets.mnist` — built-in MNIST dataset loader
-- `tf.keras.utils.image_dataset_from_directory` — loads the external validation set from a local directory
-- `tensorflow.keras.callbacks.EarlyStopping` — training callbacks
-- `tensorflow.keras.optimizers.Adam` — optimizer
-- JupyterLab / Jupyter Notebook — `ipykernel` 7.2.0, `jupyter-client` 8.8.0, `jupyter-core` 5.9.1
-- IPython 9.13.0 — kernel
-- matplotlib 3.8+ (with `matplotlib-inline` 0.1.7) — loss curve plots rendered via `FigureCanvasAgg` (headless, no display required)
-- Pillow 12.2.0 — image support (matplotlib backend dependency)
-- UV — dependency resolution and virtual environment management
-- debugpy 1.8.20 — notebook debugging support
-## Key Dependencies
-- `tensorflow==2.18.*` — model construction, training, serialization
-- `keras==3.6.*` — Sequential API, layer types, callbacks
-- `numpy>=1.26,<2.2` — array operations; resolved to 2.0.2 in lockfile
-- `requests>=2.32` — HTTP client; resolved to 2.33.1 (present in `pyproject.toml` but not actively used in current notebook cells)
-- `h5py` 3.16.0 — HDF5 model weight serialization (Keras `.h5` saves)
-- `grpcio` 1.80.0 — TensorBoard/gRPC transport
-- `tensorboard` 2.18.0 — training metrics visualization (optional)
-- `protobuf` 5.29.6 — TensorFlow serialization format
-- `tensorflow-io-gcs-filesystem` 0.37.1 — GCS dataset access (bundled with TF)
-## Configuration
-- No `.env` file present
-- No environment variables required for local training; TensorFlow uses `TF_ENABLE_ONEDNN_OPTS` (optional, noted in logs)
-- Notebook sets `MPLBACKEND=agg` and `MPLCONFIGDIR=/tmp/matplotlib-config` at runtime for headless rendering
-- `pyproject.toml` — project metadata and direct dependencies
-- `uv.lock` — fully pinned transitive dependency tree
-- `[tool.uv] package = false` — project is not installed as a package; dependencies only
-## Platform Requirements
-- Python >=3.11, <3.13
-- UV installed (`uv sync` installs all dependencies into `.venv/`)
-- Jupyter-compatible environment (`jupyter notebook notebook.ipynb`)
-- CPU-only execution confirmed; GPU support not available in current environment
-- No server deployment; deliverable is `notebook.ipynb`
-- Model weight file must be < 800 KB (grading constraint)
-- Model must accept `(28, 28)` uint8 input and output `(10,)` softmax probabilities
+- **Python** >=3.11, <3.13 — runtime resolves to 3.12.x; managed via UV (`pyproject.toml` + `uv.lock`)
+- **Jupyter Notebook** — all deliverables are notebooks; no importable `.py` modules
+- **Football predictor deps:** `pandas>=2.1`, `scikit-learn`, `pyarrow` (parquet), `seaborn` (EDA), `pytest` + `nbmake` (notebook testing)
+- **Legacy MNIST deps:** `tensorflow==2.18.*`, `keras==3.6.*`, `numpy>=1.26,<2.2`, `matplotlib>=3.8`
+- **No GPU:** TensorFlow runs CPU-only; no CUDA drivers
+- **No `.env`:** no environment variables required; notebooks set `MPLBACKEND=agg` / `MPLCONFIGDIR=/tmp/matplotlib-config` at runtime for headless rendering
 <!-- GSD:stack-end -->
 
 <!-- GSD:conventions-start source:CONVENTIONS.md -->
 ## Conventions
 
-## Project Type
 ## Naming Patterns
 - `snake_case` throughout: `x_train`, `y_train`, `x_extra`, `x_train_final`, `loss_treino`, `loss_validacao`
 - Training/data arrays follow the pattern `x_<descriptor>` and `y_<descriptor>`
@@ -142,7 +127,6 @@ A Jupyter notebook-based ML system that predicts the outcome (Home Win / Draw / 
 - No custom layer subclasses — only Keras built-ins via `Sequential`
 - `loss_treino`, `loss_validacao` (Portuguese-language labels)
 - `epocas`, `fim_fase1`
-## Language
 ## Code Style
 - No automated formatter configured (no `.prettierrc`, `black`, `ruff`, or `isort` config detected)
 - Standard PEP 8 spacing applied manually
@@ -152,22 +136,16 @@ A Jupyter notebook-based ML system that predicts the outcome (Home Win / Draw / 
 - Mix of top-level (`import numpy as np`) and sub-module (`from tensorflow.keras.layers import Dense`) imports
 - Keras objects are always imported from `tensorflow.keras` (not standalone `keras` package directly)
 - `matplotlib` uses non-interactive backend via `os.environ['MPLBACKEND'] = 'agg'` set before import in the plotting cell
-## Error Handling
-## Logging / Diagnostics
-## Comments
-## Notebook Cell Organization
-## Model Definition Pattern
-## Hyperparameter Style
-## Allowed Layers (Contract Constraint)
+## Allowed Layers (Contract Constraint — MNIST only)
 - `Dense`, `Flatten`, `Rescaling`, `BatchNormalization`, `Dropout`
 <!-- GSD:conventions-end -->
 
 <!-- GSD:architecture-start source:ARCHITECTURE.md -->
 ## Architecture
 
+> **Note:** This section describes the legacy MNIST notebook (`notebook.ipynb`). Football predictor architecture lives in `.planning/` (ROADMAP.md, phases/).
+
 ## System Overview
-```text
-```
 ## Component Responsibilities
 | Component | Responsibility | File |
 |-----------|----------------|------|
@@ -207,7 +185,6 @@ A Jupyter notebook-based ML system that predicts the outcome (Home Win / Draw / 
 - Depends on: Trained model, history objects from both phases
 - Used by: Grader (notebook output)
 ## Data Flow
-### Primary Training Path
 ### Inference / Evaluation Path
 - Model weights are held in-memory in the `model` variable throughout the notebook session
 - Training history is stored in `history_fase1` and `history_fase2` dict-like objects
@@ -241,7 +218,6 @@ A Jupyter notebook-based ML system that predicts the outcome (Home Win / Draw / 
 ## Error Handling
 - No explicit error handling around zip extraction or HTTP data loading
 - No input validation on external dataset shape before concatenation
-## Cross-Cutting Concerns
 <!-- GSD:architecture-end -->
 
 <!-- GSD:skills-start source:skills/ -->
@@ -256,9 +232,9 @@ No project skills found. Add skills to any of: `.claude/skills/`, `.agents/skill
 Before using Edit, Write, or other file-changing tools, start work through a GSD command so planning artifacts and execution context stay in sync.
 
 Use these entry points:
-- `/gsd-quick` for small fixes, doc updates, and ad-hoc tasks
-- `/gsd-debug` for investigation and bug fixing
-- `/gsd-execute-phase` for planned phase work
+- `/gsd:quick` for small fixes, doc updates, and ad-hoc tasks
+- `/gsd:debug` for investigation and bug fixing
+- `/gsd:execute-phase` for planned phase work
 
 Do not make direct repo edits outside a GSD workflow unless the user explicitly asks to bypass it.
 <!-- GSD:workflow-end -->
