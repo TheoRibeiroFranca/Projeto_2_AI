@@ -7,9 +7,9 @@
 
 ### Data
 
-- [ ] **DAT-01**: User can load and parse `campeonato-brasileiro-full.csv` as the primary historical data source (9,165 matches, 2003–2025)
-- [ ] **DAT-02**: System normalizes team names to a canonical mapping before any grouping or feature engineering (handles 20+ years of naming variants, e.g. "Atletico-MG" vs "Atletico MG")
-- [ ] **DAT-03**: System applies temporal train/test split — data sorted by date, fixed year cutoff, never random shuffle
+- [x] **DAT-01**: User can load and parse `campeonato-brasileiro-full.csv` as the primary historical data source (9,165 matches, 2003–2025)
+- [x] **DAT-02**: System normalizes team names to a canonical mapping before any grouping or feature engineering (handles 20+ years of naming variants, e.g. "Atletico-MG" vs "Atletico MG")
+- [x] **DAT-03**: System applies temporal train/test split — data sorted by date, fixed year cutoff, never random shuffle
 
 ### Features
 
@@ -60,9 +60,9 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| DAT-01 | Phase 1 | Pending |
-| DAT-02 | Phase 1 | Pending |
-| DAT-03 | Phase 1 | Pending |
+| DAT-01 | Phase 1 | Complete |
+| DAT-02 | Phase 1 | Complete |
+| DAT-03 | Phase 1 | Complete |
 | FEAT-01 | Phase 2 | Pending |
 | FEAT-02 | Phase 2 | Pending |
 | FEAT-03 | Phase 2 | Pending |

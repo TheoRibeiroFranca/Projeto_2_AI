@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-last_updated: "2026-05-21T21:13:11.167Z"
+last_updated: "2026-05-22T13:27:17.660Z"
 progress:
   total_phases: 4
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 1
-  completed_plans: 0
-  percent: 0
+  completed_plans: 1
+  percent: 25
 ---
 
 # Project State: Brazilian League Match Predictor
@@ -22,21 +22,23 @@ progress:
 
 **Core Value:** Given any two Brazilian league teams, predict the match outcome (W/D/L) with ~65-70% accuracy using the last 5 matches of form data
 
-**Current Focus:** Phase 1 — Data Ingestion & Cleaning
+**Current Focus:** Phase 01 — data-ingestion-cleaning
 
 ---
 
 ## Current Position
 
+Phase: 01 (data-ingestion-cleaning) — COMPLETE
+Plan: 1 of 1 — COMPLETE
 | Field | Value |
 |-------|-------|
 | Milestone | v1 |
 | Current Phase | 1 — Data Ingestion & Cleaning |
-| Current Plan | None (not started) |
-| Phase Status | Not started |
-| Overall Progress | 0 / 4 phases complete |
+| Current Plan | 01-01-PLAN.md (complete) |
+| Phase Status | Complete — ready for verification |
+| Overall Progress | 1 / 4 phases complete |
 
-**Progress bar:** `░░░░░░░░░░` 0%
+**Progress bar:** `██░░░░░░░░` 25%
 
 ---
 
@@ -45,7 +47,7 @@ progress:
 | Metric | Target | Current |
 |--------|--------|---------|
 | Overall accuracy (held-out test) | ~65-70% | TBD |
-| Naive baseline (always Home Win) | ~46% | TBD (verify in Phase 1 EDA) |
+| Naive baseline (always Home Win) | ~49.6% | **49.6%** (corrected — ~46% in CLAUDE.md was wrong; verified from dataset) |
 | Draw recall | > 0% | TBD |
 | Macro-F1 | Competitive with accuracy | TBD |
 
@@ -53,7 +55,9 @@ progress:
 
 ## Phase Completion Log
 
-*(Empty — no phases complete yet)*
+| Phase | Name | Plans | Date | Key Output |
+|-------|------|-------|------|------------|
+| 01 | Data Ingestion & Cleaning | 1/1 | 2026-05-22 | notebook_data.ipynb, matches_train.parquet (8025 rows), matches_test.parquet (1140 rows) |
 
 ---
 
@@ -69,6 +73,8 @@ progress:
 | `class_weight='balanced'` on all models | Draws are ~26% of data; naive training collapses draw recall | Pre-planning |
 | `.shift(1)` before `.rolling(5)` | Prevents same-match data leakage in rolling window features | Pre-planning |
 | Macro-F1 as primary metric | More informative than accuracy with class imbalance | Pre-planning |
+| HomeWin baseline = 49.6% (not 46%) | Dataset verification shows 49.6%; old ~46% figure was incorrect | Phase 1 |
+| canonical_names dict is empty (no active variants) | 46 unique team names, all internally consistent; dict is defensive guard | Phase 1 |
 
 ### Critical Pitfalls to Avoid
 
@@ -80,8 +86,8 @@ progress:
 ### Open Questions
 
 1. Does API-Football free tier cover Brasileirao (league ID 71)? (v2 concern; not blocking v1)
-2. What is the actual home win rate in this dataset? (Verify in Phase 1 EDA)
-3. How many team name variants exist? (Verify with `df['mandante'].nunique()` in Phase 1)
+2. ~~What is the actual home win rate in this dataset?~~ RESOLVED: **49.6%** (Phase 1 EDA)
+3. ~~How many team name variants exist?~~ RESOLVED: **46 unique names, 0 variants** (Phase 1 normalization)
 4. Where exactly does the stats CSV have reliable non-zero data? (Audit in Phase 1 if shot/possession features are considered for v2)
 
 ### Blockers
@@ -90,17 +96,19 @@ progress:
 
 ### Todos
 
-- [ ] Run `uv add scikit-learn pandas seaborn` to add required packages
-- [ ] Verify `campeonato-brasileiro-full.csv` schema matches research assumptions (columns: `partida_id`, `mandante`, `visitante`, `data`, `mandante_placar`, `visitante_placar`)
+- [x] Run `uv add scikit-learn pandas seaborn` — DONE (seaborn, pytest, nbmake added in Phase 1)
+- [x] Verify `campeonato-brasileiro-full.csv` schema — DONE (17 columns verified, 9165 rows confirmed)
+- [ ] Run `/gsd:verify-work` for Phase 1 before proceeding to Phase 2
 
 ---
 
 ## Session Continuity
 
-**Last active session:** 2026-05-21 (initialization)
-**Resume point:** Start Phase 1 — run `/gsd:plan-phase 1`
+**Last active session:** 2026-05-22 (Phase 1 execution)
+**Stopped at:** Completed 01-01-PLAN.md — data pipeline notebook with 8025/1140 parquet split
+**Resume point:** Run `/gsd:verify-work` for Phase 1, then proceed to Phase 2
 
 ---
 
 *State initialized: 2026-05-21*
-*Last updated: 2026-05-21*
+*Last updated: 2026-05-22*

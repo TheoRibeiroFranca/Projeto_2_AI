@@ -9,7 +9,7 @@
 
 ## Phases
 
-- [ ] **Phase 1: Data Ingestion & Cleaning** - Load CSVs, normalize team names, and apply temporal split so downstream work has a clean, leak-free dataset
+- [x] **Phase 1: Data Ingestion & Cleaning** - Load CSVs, normalize team names, and apply temporal split so downstream work has a clean, leak-free dataset (completed 2026-05-22)
 - [ ] **Phase 2: Feature Engineering** - Compute all rolling-window and form features with strict temporal integrity (no leakage)
 - [ ] **Phase 3: Baseline Model Notebooks** - Build and evaluate Logistic Regression and Random Forest classifiers with full evaluation suite
 - [ ] **Phase 4: Advanced Model Notebook + Polish** - Deliver Gradient Boosting notebook targeting 65-70% accuracy with documentation quality for submission
@@ -27,9 +27,9 @@
   2. Team name normalization maps every variant to a canonical form — top clubs each have 380+ match rows after normalization
   3. Data is sorted by date and a fixed year cutoff produces non-overlapping train and test sets (no row appears in both)
   4. An EDA cell confirms the observed home win rate and class distribution (Home Win / Draw / Away Win) for the full dataset
-**Plans:** 1 plan
+**Plans:** 1/1 plans complete
 Plans:
-- [ ] 01-01-PLAN.md — Add notebook deps (pyarrow, seaborn, pytest, nbmake), build `notebook_data.ipynb` (load → parse → derive → normalize → rename → split → save), and lock end-to-end nbmake validation with EDA
+- [x] 01-01-PLAN.md — Add notebook deps (pyarrow, seaborn, pytest, nbmake), build `notebook_data.ipynb` (load → parse → derive → normalize → rename → split → save), and lock end-to-end nbmake validation with EDA
 
 ### Phase 2: Feature Engineering
 **Goal**: A `feature_matrix` DataFrame exists where every row is a match with pre-match-only features and no data leakage
@@ -71,7 +71,7 @@ Plans:
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Data Ingestion & Cleaning | 0/1 | Planned | - |
+| 1. Data Ingestion & Cleaning | 1/1 | Complete   | 2026-05-22 |
 | 2. Feature Engineering | 0/0 | Not started | - |
 | 3. Baseline Model Notebooks | 0/0 | Not started | - |
 | 4. Advanced Model Notebook + Polish | 0/0 | Not started | - |
