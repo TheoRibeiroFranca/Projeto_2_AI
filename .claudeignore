@@ -1,0 +1,25 @@
+# Virtual environment
+.venv/
+
+# Large data files (read via notebook — not useful for Claude to index)
+dados/archive/*.csv
+dados/archive.zip
+
+# Parquet outputs (generated artifacts)
+dados/*.parquet
+
+# Jupyter checkpoints
+.ipynb_checkpoints/
+**/.ipynb_checkpoints/
+
+# Python cache
+__pycache__/
+**/__pycache__/
+*.pyc
+*.pyo
+
+# UV lock file (too large, not instructive)
+uv.lock
+
+# Git internals
+.git/
