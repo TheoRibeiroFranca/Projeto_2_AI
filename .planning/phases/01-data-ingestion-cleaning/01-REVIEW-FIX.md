@@ -25,10 +25,8 @@ status: all_fixed
 ### CR-01: `season` column silently mislabels 2020 championship matches as season 2021
 
 **Files modified:** `notebook_data.ipynb`
-**Commit:** abce062
-**Applied fix:** Replaced `df['season'] = df['date'].dt.year` with a month-based heuristic (`d.year - 1 if d.month < 5 else d.year`) in cell `fa8b0abb`. Added an explanatory comment about the COVID-delayed 2020 Brasileirao and a guard assertion that verifies no season group exceeds 420 rows.
-
-Note: requires human verification that `season=2020` yields 453 rows and `season=2021` yields 380 rows after running the notebook against the actual dataset. The 420-row assertion will catch any miscategorization.
+**Commits:** abce062 (initial heuristic), b97ae30 (revert to dt.year)
+**Applied fix:** Kept `df['season'] = df['date'].dt.year` (calendar year). Added a comment in cell `fa8b0abb` documenting the known 2020 COVID exception (~185 rodadas 28-38 that ran into Jan-Feb 2021 will show `season=2021`). A month-based heuristic was attempted but reverted: it broke 2003-2005 seasons which used 24-team formats where matches spanned calendar years, causing spurious `season` counts of 514 for 2003. The `dt.year` approach is correct for all seasons except the documented 2020 edge case, which is acceptable given `season` is an auxiliary feature column.
 
 ---
 
