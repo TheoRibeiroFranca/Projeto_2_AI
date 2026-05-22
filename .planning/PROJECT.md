@@ -12,11 +12,9 @@ Given any two Brazilian league teams, predict the match outcome with meaningful 
 
 ### Validated
 
-(None yet — ship to validate)
+- [x] Load and parse Brazilian league match data from `dados/archive/` CSVs — *Validated in Phase 1: Data Ingestion & Cleaning (2026-05-22)*
 
 ### Active
-
-- [ ] Load and parse Brazilian league match data from `dados/archive/` CSVs
 - [ ] Supplement historical data with live/current data from an external football API
 - [ ] Engineer features: goals scored/conceded (last 5), W/D/L streak (last 5), home/away record
 - [ ] Train a classifier to predict Home Win / Draw / Away Win
@@ -53,7 +51,7 @@ Given any two Brazilian league teams, predict the match outcome with meaningful 
 | W/D/L classification (not score prediction) | Simpler target, more data, clearer success metric | — Pending |
 
 ---
-*Last updated: 2026-05-21 after initialization*
+*Last updated: 2026-05-22 — Phase 1 complete (data pipeline + parquet outputs delivered)*
 
 ## Evolution
 
