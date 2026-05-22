@@ -41,7 +41,10 @@ Plans:
   3. Home win%, draw%, loss% and away win%, draw%, loss% columns are present and computed per team per current season
   4. Derived columns goal_difference_last5 and points_last5 are present and consistent with the underlying goals/result columns
   5. A reusable `build_features(df)` function exists that can reconstruct the feature matrix from any filtered date range without modification
-**Plans**: TBD
+**Plans:** 2 plans
+Plans:
+- [ ] 02-01-PLAN.md — `uv sync` + define `build_features(df)` in notebook_data.ipynb (FEAT-01/02/03/04 in one function) + apply on combined train+test, re-split by season, save `dados/feature_matrix_{train,test}.parquet` (8025×31 and 1140×31, 0 NaN)
+- [ ] 02-02-PLAN.md — Add leakage verification cell (raw shift(1).rolling(5) reconstruction asserts first-match-per-team-season is NaN) + feature stats sanity cell (.describe() + class-conditional means) + sign off 02-VALIDATION.md
 
 ### Phase 3: Baseline Model Notebooks
 **Goal**: Two separate model notebooks exist that each beat the naive home-win baseline, expose a prediction function, and report per-class evaluation metrics
@@ -72,11 +75,11 @@ Plans:
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Data Ingestion & Cleaning | 1/1 | Complete   | 2026-05-22 |
-| 2. Feature Engineering | 0/0 | Not started | - |
+| 2. Feature Engineering | 0/2 | Planned | - |
 | 3. Baseline Model Notebooks | 0/0 | Not started | - |
 | 4. Advanced Model Notebook + Polish | 0/0 | Not started | - |
 
 ---
 
 *Created: 2026-05-21*
-*Last updated: 2026-05-21*
+*Last updated: 2026-05-22*
