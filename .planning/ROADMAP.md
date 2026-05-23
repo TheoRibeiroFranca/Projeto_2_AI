@@ -71,11 +71,11 @@ Plans:
   2. All three model notebooks contain markdown cells that explain the data source, feature engineering choices, model selection rationale, and results interpretation
   3. `predict_match(home_team, away_team)` in the gradient boost notebook returns a correct W/D/L label for a manually-verified example match
 
-**Plans:** 2 plans
+**Plans:** 1/2 plans executed
 Plans:
 **Wave 1**
 
-- [ ] 04-01-PLAN.md — Build `notebook_gradient_boost.ipynb`: HistGradientBoostingClassifier(learning_rate=0.05, max_iter=300, max_depth=5, balanced), TSS cross-val, classification_report, seaborn heatmap, naive baseline comparison, predict_match function
+- [x] 04-01-PLAN.md — Build `notebook_gradient_boost.ipynb`: HistGradientBoostingClassifier(learning_rate=0.05, max_iter=300, max_depth=5, balanced), TSS cross-val, classification_report, seaborn heatmap, naive baseline comparison, predict_match function
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
@@ -90,7 +90,7 @@ Plans:
 | 1. Data Ingestion & Cleaning | 1/1 | Complete   | 2026-05-22 |
 | 2. Feature Engineering | 2/2 | Complete   | 2026-05-23 |
 | 3. Baseline Model Notebooks | 2/2 | Complete   | 2026-05-23 |
-| 4. Advanced Model Notebook + Polish | 0/2 | Not started | - |
+| 4. Advanced Model Notebook + Polish | 1/2 | In Progress|  |
 
 ---
 
