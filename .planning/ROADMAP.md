@@ -10,7 +10,7 @@
 ## Phases
 
 - [x] **Phase 1: Data Ingestion & Cleaning** - Load CSVs, normalize team names, and apply temporal split so downstream work has a clean, leak-free dataset (completed 2026-05-22)
-- [ ] **Phase 2: Feature Engineering** - Compute all rolling-window and form features with strict temporal integrity (no leakage)
+- [x] **Phase 2: Feature Engineering** - Compute all rolling-window and form features with strict temporal integrity (no leakage) (completed 2026-05-23)
 - [ ] **Phase 3: Baseline Model Notebooks** - Build and evaluate Logistic Regression and Random Forest classifiers with full evaluation suite
 - [ ] **Phase 4: Advanced Model Notebook + Polish** - Deliver Gradient Boosting notebook targeting 65-70% accuracy with documentation quality for submission
 
@@ -48,7 +48,7 @@ Plans:
   4. Derived columns goal_difference_last5 and points_last5 are present and consistent with the underlying goals/result columns
   5. A reusable `build_features(df)` function exists that can reconstruct the feature matrix from any filtered date range without modification
 
-**Plans:** 1/2 plans executed
+**Plans:** 2/2 plans complete
 Plans:
 **Wave 1**
 
@@ -56,7 +56,7 @@ Plans:
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 02-02-PLAN.md — Add leakage verification cell (raw shift(1).rolling(5) reconstruction asserts first-match-per-team-season is NaN) + feature stats sanity cell (.describe() + class-conditional means) + sign off 02-VALIDATION.md
+- [x] 02-02-PLAN.md — Add leakage verification cell (raw shift(1).rolling(5) reconstruction asserts first-match-per-team-season is NaN) + feature stats sanity cell (.describe() + class-conditional means) + sign off 02-VALIDATION.md
 
 ### Phase 3: Baseline Model Notebooks
 
@@ -93,7 +93,7 @@ Plans:
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Data Ingestion & Cleaning | 1/1 | Complete   | 2026-05-22 |
-| 2. Feature Engineering | 1/2 | In Progress|  |
+| 2. Feature Engineering | 2/2 | Complete   | 2026-05-23 |
 | 3. Baseline Model Notebooks | 0/0 | Not started | - |
 | 4. Advanced Model Notebook + Polish | 0/0 | Not started | - |
 
