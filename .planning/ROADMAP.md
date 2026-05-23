@@ -71,7 +71,7 @@ Plans:
   2. All three model notebooks contain markdown cells that explain the data source, feature engineering choices, model selection rationale, and results interpretation
   3. `predict_match(home_team, away_team)` in the gradient boost notebook returns a correct W/D/L label for a manually-verified example match
 
-**Plans:** 1/2 plans executed
+**Plans:** 2/2 plans complete
 Plans:
 **Wave 1**
 
@@ -79,7 +79,7 @@ Plans:
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 04-02-PLAN.md — Add bookend markdown cells (title/intro + results interpretation) to all three model notebooks (LR, RF, GBM)
+- [x] 04-02-PLAN.md — Add bookend markdown cells (title/intro + results interpretation) to all three model notebooks (LR, RF, GBM)
 
 ---
 
@@ -90,7 +90,7 @@ Plans:
 | 1. Data Ingestion & Cleaning | 1/1 | Complete   | 2026-05-22 |
 | 2. Feature Engineering | 2/2 | Complete   | 2026-05-23 |
 | 3. Baseline Model Notebooks | 2/2 | Complete   | 2026-05-23 |
-| 4. Advanced Model Notebook + Polish | 1/2 | In Progress|  |
+| 4. Advanced Model Notebook + Polish | 2/2 | Complete   | 2026-05-23 |
 
 ---
 
