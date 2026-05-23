@@ -1,25 +1,23 @@
 ---
 phase: 03-baseline-model-notebooks
 verified: 2026-05-23T19:30:00Z
-status: human_needed
+re_verified: 2026-05-23T19:55:00Z
+status: passed
 score: 18/18 must-haves verified
 overrides_applied: 0
 gaps: []
-human_verification:
-  - test: "Visually open notebook_logistic.ipynb and notebook_random_forest.ipynb, scroll to the classification_report cell (Cell 12) output. Confirm whether the row order (printed labels) is acceptable for grading and downstream Phase 4 work."
-    expected: "Reader must understand whether the printed `HomeWin`/`AwayWin` rows correspond to the real HomeWin/AwayWin class metrics. NOTE: CR-01 from 03-REVIEW.md is empirically confirmed — sklearn sorts labels alphabetically (AwayWin, Draw, HomeWin) and applies target_names positionally, so the printed `HomeWin` row actually contains AwayWin's metrics (support=293) and the printed `AwayWin` row actually contains HomeWin's metrics (support=549). The Draw row is correct only by alphabetical coincidence. Macro-F1 (0.40 for LR, 0.38 for RF) and overall accuracy values are not affected, but per-class metric interpretation IS swapped."
-    why_human: "The notebooks run, the must_haves pass (Draw recall non-zero, all three classes appear on heatmap axes, etc.), but the per-class metric labels are misleading. Whether this blocks the phase depends on a human judgment call: (a) does the reviewer/grader accept that the printed report contains correct macro-aggregates but mislabeled per-class rows, or (b) is the classification_report a user-facing artifact whose printed row labels must match reality? The verifier task description explicitly flagged CR-01 as 'real but not necessarily blocking; advisory only', so this is routed to human review rather than auto-failed."
-  - test: "Run `predict_match('Flamengo', 'Palmeiras')` in both notebooks (or via the example cell) and visually inspect the sklearn UserWarning emitted ('X does not have valid feature names, but {Model} was fitted with feature names')."
-    expected: "The warning is benign — the notebook still produces a valid W/D/L label and predict_match returns 'HomeWin' in both notebooks. Decide whether the noisy output is acceptable for submission or whether WR-01 from 03-REVIEW.md should be patched (wrap vector in pd.DataFrame with FEATURE_COLS columns before .predict())."
-    why_human: "Cosmetic — does not affect correctness. The plan summary explicitly notes this was left as-is intentionally because 'fixing it would add a stylistic cell modification with no behavioral change'. Human chooses whether to accept or fix before Phase 4."
+resolved_items:
+  - CR-01: "Resolved in commit 2f937dc — both notebooks now pass labels=['HomeWin','Draw','AwayWin'] alongside target_names so per-class row labels match metrics. Empirical re-check: classification_report rows now read HomeWin (support=549), Draw (support=298), AwayWin (support=293) — matches the real class distribution."
+  - WR-01: "User-accepted as-is during phase close. The sklearn UserWarning about feature-name-less ndarray on predict_match calls is cosmetic; prediction correctness is unaffected. Tracked in 03-HUMAN-UAT.md for future cleanup."
 ---
 
 # Phase 3: Baseline Model Notebooks Verification Report
 
 **Phase Goal:** Build two baseline classifier notebooks (Logistic Regression and Random Forest) that load the Phase 2 feature matrices, train class-balanced models, report TimeSeriesSplit cross-validation scores + macro-F1, evaluate on the held-out test parquet, visualize the confusion matrix, compare against the naive 0.4816 home-win baseline, and expose a `predict_match(home_team, away_team)` function for ad-hoc predictions.
 **Verified:** 2026-05-23T19:30:00Z
-**Status:** human_needed
-**Re-verification:** No — initial verification
+**Re-verified:** 2026-05-23T19:55:00Z (after CR-01 inline fix)
+**Status:** passed
+**Re-verification:** Yes — CR-01 patched and confirmed via empirical re-run of classification_report
 
 ## Goal Achievement
 
