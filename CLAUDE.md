@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **Active: Brazilian League Match Predictor** (GSD-managed — see `.planning/`)
 Predicts W/D/L outcomes for Brazilian Série A matches using rolling-window form features and scikit-learn classifiers. Three separate model notebooks: Logistic Regression, Random Forest, Gradient Boosting. Target: ~65-70% accuracy.
-Phase status: Phase 1 (data ingestion) ✓ | Phase 2 (feature engineering) ✓ | Phase 3 (baseline models) pending | Phase 4 (GBM + polish) pending
+Phase status: Phase 1 (data ingestion) ✓ | Phase 2 (feature engineering) ✓ | Phase 3 (baseline models) ✓ | Phase 4 (GBM + polish) pending
 
 **Legacy: MNIST Digit Classifier** (`notebook.ipynb`)
 Insper AI trainee deliverable. Two-phase Keras training on inverted MNIST. Input `(28,28)` uint8 → `(10,)` softmax. Weight file < 800 KB. Allowed layers: `Dense`, `Flatten`, `Rescaling`, `BatchNormalization`, `Dropout`.
@@ -25,11 +25,12 @@ jupyter notebook notebook_data.ipynb
 
 # Test notebook execution end-to-end
 pytest --nbmake notebook_data.ipynb -x
+pytest --nbmake notebook_logistic.ipynb notebook_random_forest.ipynb -x
 
 # Launch football predictor model notebooks (created during execution phases)
 jupyter notebook notebook_logistic.ipynb        # Logistic Regression baseline
 jupyter notebook notebook_random_forest.ipynb   # Random Forest
-jupyter notebook notebook_gradient_boost.ipynb  # Gradient Boosting (target: 65-70%)
+# jupyter notebook notebook_gradient_boost.ipynb  # Gradient Boosting — Phase 4, ainda não criado
 
 # Launch legacy MNIST notebook
 jupyter notebook notebook.ipynb
