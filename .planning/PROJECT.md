@@ -51,7 +51,7 @@ Given any two Brazilian league teams, predict the match outcome with meaningful 
 | W/D/L classification (not score prediction) | Simpler target, more data, clearer success metric | — Pending |
 
 ---
-*Last updated: 2026-05-23 — Phase 2 complete (feature engineering: build_features() with anti-leakage rolling windows, feature parquets saved)*
+*Last updated: 2026-05-23
 
 ## Evolution
 
