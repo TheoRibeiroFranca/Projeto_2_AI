@@ -53,12 +53,12 @@ Plans:
   4. Both notebooks expose a `predict_match(home_team, away_team)` function that returns a W/D/L label using only pre-match features
   5. Both notebooks output a `classification_report` and a confusion matrix heatmap showing non-zero recall for all three classes (Home Win, Draw, Away Win)
 
-**Plans:** 2 plans
+**Plans:** 2/2 plans complete
 Plans:
 **Wave 1** *(both plans are independent and can run in parallel)*
 
-- [ ] 03-01-PLAN.md — Build `notebook_logistic.ipynb`: LogisticRegression(balanced, lbfgs, max_iter=1000), TSS cross-val, classification_report, seaborn heatmap, naive baseline comparison, predict_match function
-- [ ] 03-02-PLAN.md — Build `notebook_random_forest.ipynb`: RandomForestClassifier(n=200, balanced, min_samples_leaf=5), TSS cross-val, classification_report, seaborn heatmap, naive baseline comparison, predict_match function
+- [x] 03-01-PLAN.md — Build `notebook_logistic.ipynb`: LogisticRegression(balanced, lbfgs, max_iter=1000), TSS cross-val, classification_report, seaborn heatmap, naive baseline comparison, predict_match function
+- [x] 03-02-PLAN.md — Build `notebook_random_forest.ipynb`: RandomForestClassifier(n=200, balanced, min_samples_leaf=5), TSS cross-val, classification_report, seaborn heatmap, naive baseline comparison, predict_match function
 
 ### Phase 4: Advanced Model Notebook + Polish
 
@@ -81,7 +81,7 @@ Plans:
 |-------|----------------|--------|-----------|
 | 1. Data Ingestion & Cleaning | 1/1 | Complete   | 2026-05-22 |
 | 2. Feature Engineering | 2/2 | Complete   | 2026-05-23 |
-| 3. Baseline Model Notebooks | 0/2 | Not started | - |
+| 3. Baseline Model Notebooks | 2/2 | Complete   | 2026-05-23 |
 | 4. Advanced Model Notebook + Polish | 0/0 | Not started | - |
 
 ---
