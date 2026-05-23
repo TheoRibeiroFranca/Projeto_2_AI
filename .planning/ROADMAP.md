@@ -48,11 +48,11 @@ Plans:
   4. Derived columns goal_difference_last5 and points_last5 are present and consistent with the underlying goals/result columns
   5. A reusable `build_features(df)` function exists that can reconstruct the feature matrix from any filtered date range without modification
 
-**Plans:** 2 plans
+**Plans:** 1/2 plans executed
 Plans:
 **Wave 1**
 
-- [ ] 02-01-PLAN.md — `uv sync` + define `build_features(df)` in notebook_data.ipynb (FEAT-01/02/03/04 in one function) + apply on combined train+test, re-split by season, save `dados/feature_matrix_{train,test}.parquet` (8025×31 and 1140×31, 0 NaN)
+- [x] 02-01-PLAN.md — `uv sync` + define `build_features(df)` in notebook_data.ipynb (FEAT-01/02/03/04 in one function) + apply on combined train+test, re-split by season, save `dados/feature_matrix_{train,test}.parquet` (8025×31 and 1140×31, 0 NaN)
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
@@ -93,7 +93,7 @@ Plans:
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Data Ingestion & Cleaning | 1/1 | Complete   | 2026-05-22 |
-| 2. Feature Engineering | 0/2 | Planned | - |
+| 2. Feature Engineering | 1/2 | In Progress|  |
 | 3. Baseline Model Notebooks | 0/0 | Not started | - |
 | 4. Advanced Model Notebook + Polish | 0/0 | Not started | - |
 
