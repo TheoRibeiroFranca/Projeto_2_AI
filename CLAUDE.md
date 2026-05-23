@@ -6,6 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **Active: Brazilian League Match Predictor** (GSD-managed — see `.planning/`)
 Predicts W/D/L outcomes for Brazilian Série A matches using rolling-window form features and scikit-learn classifiers. Three separate model notebooks: Logistic Regression, Random Forest, Gradient Boosting. Target: ~65-70% accuracy.
+Phase status: Phase 1 (data ingestion) ✓ | Phase 2 (feature engineering) ✓ | Phase 3 (baseline models) pending | Phase 4 (GBM + polish) pending
 
 **Legacy: MNIST Digit Classifier** (`notebook.ipynb`)
 Insper AI trainee deliverable. Two-phase Keras training on inverted MNIST. Input `(28,28)` uint8 → `(10,)` softmax. Weight file < 800 KB. Allowed layers: `Dense`, `Flatten`, `Rescaling`, `BatchNormalization`, `Dropout`.
@@ -13,9 +14,8 @@ Insper AI trainee deliverable. Two-phase Keras training on inverted MNIST. Input
 ## Setup & Running
 
 ```bash
-# Install base dependencies
+# Install all dependencies (football predictor + MNIST deps all in pyproject.toml)
 uv sync
-uv add scikit-learn pyarrow seaborn pytest nbmake  # football predictor deps (not yet in pyproject.toml)
 
 # Activate virtual environment
 source .venv/bin/activate
@@ -85,6 +85,30 @@ The legacy MNIST notebook loads data from `keras.datasets` and a fixed HTTP URL.
 
 **Do not re-derive `result` or re-run cleaning in model notebooks — load from parquet.**
 
+## Football Predictor — Feature Matrix Contract
+
+`notebook_data.ipynb` (Phase 2) produces the feature parquet files that **all model notebooks must load**:
+
+| File | Rows | Columns |
+|------|------|---------|
+| `dados/feature_matrix_train.parquet` | 8,025 | 31 |
+| `dados/feature_matrix_test.parquet` | 1,140 | 31 |
+
+**Schema:** 11 base columns (same as matches parquet) plus 20 feature columns:
+
+| Feature | Description |
+|---------|-------------|
+| `home_goals_scored_last5` / `away_goals_scored_last5` | Rolling 5-match goals scored |
+| `home_goals_conceded_last5` / `away_goals_conceded_last5` | Rolling 5-match goals conceded |
+| `home_wins_last5` / `home_draws_last5` / `home_losses_last5` | Home form (last 5) |
+| `away_wins_last5` / `away_draws_last5` / `away_losses_last5` | Away form (last 5) |
+| `home_win_pct_season` / `home_draw_pct_season` / `home_loss_pct_season` | Season win/draw/loss % (home) |
+| `away_win_pct_season` / `away_draw_pct_season` / `away_loss_pct_season` | Season win/draw/loss % (away) |
+| `home_goal_diff_last5` / `away_goal_diff_last5` | Goal difference last 5 |
+| `home_points_last5` / `away_points_last5` | Points accumulated last 5 |
+
+**Model notebooks must load `feature_matrix_*.parquet`, not `matches_*.parquet`.** Round-1 rows have NaN features — drop or impute before fitting.
+
 <!-- GSD:project-start source:PROJECT.md -->
 ## Project
 
@@ -143,81 +167,9 @@ A Jupyter notebook-based ML system that predicts the outcome (Home Win / Draw / 
 <!-- GSD:architecture-start source:ARCHITECTURE.md -->
 ## Architecture
 
-> **Note:** This section describes the legacy MNIST notebook (`notebook.ipynb`). Football predictor architecture lives in `.planning/` (ROADMAP.md, phases/).
+**Football predictor:** Architecture and phase plans live in `.planning/` (ROADMAP.md, phases/). Data flow: `campeonato-brasileiro-full.csv` → `notebook_data.ipynb` → `feature_matrix_{train,test}.parquet` → model notebooks.
 
-## System Overview
-## Component Responsibilities
-| Component | Responsibility | File |
-|-----------|----------------|------|
-| Data Loading | Load MNIST via keras, extract external validation zip | `notebook.ipynb` cell `8b3f3fbb`, `35d075b9` |
-| Data Augmentation | Invert pixel values (255 - x) on train and test sets | `notebook.ipynb` cell `35d075b9` |
-| External Validation Loader | Read `validation-set.zip` into numpy arrays | `notebook.ipynb` cell `35d075b9` |
-| Model Definition | Keras Sequential with preprocessing baked in | `notebook.ipynb` cell `7a84b337` |
-| Phase 1 Training | Broad generalization on inverted MNIST + external data | `notebook.ipynb` cell `35d075b9` |
-| Phase 2 Fine-tuning | Domain adaptation on external validation set only | `notebook.ipynb` cell `35d075b9` |
-| Evaluation | Accuracy metrics on train and test sets | `notebook.ipynb` cell `3fd76014` |
-| Visualization | Combined loss curve spanning both phases | `notebook.ipynb` cell `0967d16e` |
-## Pattern Overview
-- All logic lives in `notebook.ipynb`; there are no importable Python modules
-- Preprocessing is baked into the model as `Rescaling` and `Flatten` layers (grading requirement)
-- Two-phase training separates broad generalization (Phase 1) from domain-specific fine-tuning (Phase 2)
-- Data augmentation uses pixel inversion to simulate the external validation set's domain
-## Layers
-- Purpose: Load, augment, and concatenate training data
-- Location: `notebook.ipynb` cells `8b3f3fbb` and `35d075b9`
-- Contains: MNIST loading, zip extraction, numpy array assembly, pixel inversion
-- Depends on: `keras.datasets.mnist`, `zipfile`, `tensorflow.keras.utils.image_dataset_from_directory`
-- Used by: Training orchestration layer
-- Purpose: Declare the neural network architecture as a Keras Sequential model
-- Location: `notebook.ipynb` cell `7a84b337`
-- Contains: `Rescaling(1/255)`, `Flatten`, four `Dense→BatchNormalization→Dropout` blocks, softmax output
-- Allowed layers only: `Dense`, `Flatten`, `Rescaling`, `BatchNormalization`, `Dropout`
-- Depends on: `tensorflow.keras`
-- Used by: Training orchestration layer
-- Purpose: Execute two-phase training with separate hyperparameters and data distributions
-- Location: `notebook.ipynb` cell `35d075b9`
-- Contains: `model.fit` calls for Phase 1 and Phase 2, EarlyStopping callbacks, data tiling logic
-- Depends on: Model Definition layer, Data Ingestion layer
-- Used by: Evaluation layer
-- Purpose: Report accuracy and render loss curves
-- Location: `notebook.ipynb` cells `3fd76014` and `0967d16e`
-- Contains: `model.evaluate`, matplotlib figure combining both phase histories
-- Depends on: Trained model, history objects from both phases
-- Used by: Grader (notebook output)
-## Data Flow
-### Inference / Evaluation Path
-- Model weights are held in-memory in the `model` variable throughout the notebook session
-- Training history is stored in `history_fase1` and `history_fase2` dict-like objects
-- No model serialization (saving/loading weights) is present in the current notebook
-## Key Abstractions
-- Purpose: Encapsulates the full inference pipeline including preprocessing
-- Location: `notebook.ipynb` cell `7a84b337`
-- Pattern: `model = Sequential([Rescaling(1/255), Flatten(), Dense(200, 'relu'), BatchNormalization(), Dropout(0.1), ...])`
-- Purpose: Produce a single continuous loss curve across both training phases
-- Location: `notebook.ipynb` cell `0967d16e`
-- Pattern: Concatenate `history_fase1.history['loss'] + history_fase2.history['loss']`, draw `axvline` at `fim_fase1`
-- Purpose: Domain adaptation — external validation set uses dark-on-light images; MNIST uses light-on-dark
-- Location: `notebook.ipynb` cell `35d075b9`
-- Pattern: `x_train_inv = 255 - x_train`
-## Entry Points
-- Location: `notebook.ipynb`
-- Triggers: `jupyter notebook notebook.ipynb` then "Run All Cells"
-- Responsibilities: Executes all data loading, training, evaluation, and visualization in cell order
-## Architectural Constraints
-- **Allowed layers:** Only `Dense`, `Flatten`, `Rescaling`, `BatchNormalization`, `Dropout` (grading contract)
-- **Input contract:** Model must accept `(28, 28)` uint8 tensors (values 0–255); preprocessing must be internal
-- **Output contract:** Model must produce `(10,)` softmax probability vector
-- **Weight budget:** Total parameters (trainable + non-trainable) must serialize to < 800 KB
-- **No module imports:** No `.py` source files exist; all logic is inline in the notebook
-- **External data dependency:** Phase 1 training references `x_sint` / `y_sint` variables that are not defined in the visible cells — this is an unresolved reference in the current notebook state
-- **No GPU:** TensorFlow runs CPU-only (CUDA drivers not found in execution environment)
-## Anti-Patterns
-### Undefined Variable Reference (`x_sint` / `y_sint`)
-### No Model Persistence
-### Final Dense Layer Without Softmax Activation
-## Error Handling
-- No explicit error handling around zip extraction or HTTP data loading
-- No input validation on external dataset shape before concatenation
+**Legacy MNIST (`notebook.ipynb`):** All logic is inline (no `.py` modules). Two-phase training: Phase 1 broad generalization on inverted MNIST + external data; Phase 2 fine-tuning on external validation set only. Preprocessing (`Rescaling(1/255)`, `Flatten`) is baked into the model. Key constraints: allowed layers only (`Dense`, `Flatten`, `Rescaling`, `BatchNormalization`, `Dropout`), input `(28,28)` uint8, output `(10,)` softmax, weight file < 800 KB. Training history in `history_fase1` / `history_fase2`; no model serialization.
 <!-- GSD:architecture-end -->
 
 <!-- GSD:skills-start source:skills/ -->
